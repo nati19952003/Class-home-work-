@@ -1,0 +1,116 @@
+#include <stdio.h>
+#include <string.h>
+
+#define NUM_FAILED 2
+#define NUM_MESSAGES 5
+#define MAX_NAME_LEN 50
+#define MAX_MESSAGE_LEN 100
+
+
+char memorial01_arr[NUM_FAILED][4][100] = {
+    {"Jiyeon Park", "102345", "milliways", "jiyeon@milli.com"},
+    {"Ethan Smith", "102346", "milliways", "ethan@milli.com"}
+};
+
+
+char rollingpp01[NUM_MESSAGES][MAX_MESSAGE_LEN];
+
+
+char senders[NUM_MESSAGES][MAX_NAME_LEN] = {
+    "Helena Silva", "Liam Wilson", "Minji Lee", "Noah Brown", "Arthur"
+};
+
+int messageCount = 0;
+
+// Function to write a message to a failed candidate
+void writeMessage() {
+    int recipientIndex;
+    char message[MAX_MESSAGE_LEN];
+
+    printf("Choose recipient:\n");
+    for (int i = 0; i < NUM_FAILED; i++) {
+        printf("%d. %s\n", i + 1, memorial01_arr[i][0]);
+    }
+
+    printf("Enter recipient number: ");
+    scanf("%d", &recipientIndex);
+    recipientIndex--;
+
+    if (recipientIndex < 0 || recipientIndex >= NUM_FAILED) {
+        printf("Invalid selection.\n");
+        return;
+    }
+
+    printf("Enter message for %s: ", memorial01_arr[recipientIndex][0]);
+    scanf(" %[^\n]", message);
+
+    if (messageCount < NUM_MESSAGES) {
+        snprintf(rollingpp01[messageCount], MAX_MESSAGE_LEN, "%s: %s", senders[messageCount], message);
+        messageCount++;
+        printf("Message saved!\n");
+    } else {
+        printf("Message limit reached.\n");
+    }
+}
+
+// View messages for a specific failed candidate
+void viewMessages() {
+    int recipientIndex;
+    printf("View messages for:\n");
+    for (int i = 0; i < NUM_FAILED; i++) {
+        printf("%d. %s\n", i + 1, memorial01_arr[i][0]);
+    }
+
+    printf("Enter recipient number: ");
+    scanf("%d", &recipientIndex);
+    recipientIndex--;
+
+    if (recipientIndex < 0 || recipientIndex >= NUM_FAILED) {
+        printf("Invalid selection.\n");
+        return;
+    }
+
+    printf("Messages for %s (%s):\n", memorial01_arr[recipientIndex][0], memorial01_arr[recipientIndex][3]);
+    for (int i = 0; i < messageCount; i++) {
+        printf("- %s\n", rollingpp01[i]);
+    }
+
+    char choice;
+    printf("Would you like to send the email? (Y/N): ");
+    scanf(" %c", &choice);
+
+    if (choice == 'Y' || choice == 'y') {
+        printf("Email has been sent to %s!\n", memorial01_arr[recipientIndex][3]);
+    } else {
+        printf("Email not sent.\n");
+    }
+}
+
+int main() {
+    int option;
+
+    while (1) {
+        printf("\n===== Remember Me - Memorial Menu =====\n");
+        printf("1. Write rolling paper message\n");
+        printf("2. View messages for a failed candidate\n");
+        printf("0. Exit\n");
+        printf("Select an option: ");
+        scanf("%d", &option);
+
+        if (option == 0) break;
+
+        switch (option) {
+            case 1:
+                writeMessage();
+                break;
+            case 2:
+                viewMessages();
+                break;
+            default:
+                printf("Invalid option.\n");
+        }
+    }
+
+    printf("Goodbye.\n");
+    return 0;
+}
