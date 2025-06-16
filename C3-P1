@@ -1,4 +1,4 @@
-
+// stage2.c
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -34,4 +34,85 @@ int getRandomAbility() {
     return rand() % 901 + 100; // 100 to 1000
 }
 
-// Initialize trainees with name, ascii sum, and
+// Initialize trainees with name, ascii sum, and ability
+void initTrainees(Trainee trainees[], int count, char names[][NAME_LEN]) {
+    for (int i = 0; i < count; i++) {
+        strcpy(trainees[i].name, names[i]);
+        trainees[i].asciiSum = parseIntMember(names[i]);
+        trainees[i].ability = getRandomAbility();
+    }
+}
+
+// Input up to 8 mentors
+void inputMentors(Mentor mentors[], int *count) {
+    printf("\nEnter mentor names (max %d):\n", MAX_MENTORS);
+    for (int i = 0; i < MAX_MENTORS; i++) {
+        printf("Mentor %d name: ", i + 1);
+        fgets(mentors[i].name, NAME_LEN, stdin);
+        mentors[i].name[strcspn(mentors[i].name, "\n")] = '\0'; // remove newline
+        mentors[i].id = i + 1;
+        mentors[i].menteeIndex = -1;
+    }
+    *count = MAX_MENTORS;
+}
+
+// Randomly match mentors to unique trainees (1:1)
+void matchMentoring(Trainee trainees[], int traineeCount, Mentor mentors[], int mentorCount) {
+    int used[MAX_TRAINEES] = {0};
+    srand(time(NULL));
+
+    for (int i = 0; i < mentorCount && i < traineeCount; i++) {
+        int randIndex;
+        do {
+            randIndex = rand() % traineeCount;
+        } while (used[randIndex]);
+
+        used[randIndex] = 1;
+        mentors[i].menteeIndex = randIndex;
+    }
+}
+
+// Print matched mentor-trainee pairs
+void printMatches(Trainee trainees[], Mentor mentors[], int mentorCount) {
+    printf("\n--- Mentoring Matches ---\n");
+    for (int i = 0; i < mentorCount; i++) {
+        int idx = mentors[i].menteeIndex;
+        if (idx != -1) {
+            printf("Trainee #%d (%s) with Mentor ID %d (%s)\n",
+                   idx + 1, trainees[idx].name, mentors[i].id, mentors[i].name);
+        }
+    }
+}
+
+// Show trainees' info
+void printTrainees(Trainee trainees[], int count) {
+    printf("\n--- Trainee List ---\n");
+    for (int i = 0; i < count; i++) {
+        printf("Trainee #%d: %s | ASCII Sum: %d | Ability: %d\n",
+               i + 1, trainees[i].name, trainees[i].asciiSum, trainees[i].ability);
+    }
+}
+
+int main() {
+    Trainee trainees[MAX_TRAINEES];
+    Mentor mentors[MAX_MENTORS];
+    int mentorCount = 0;
+
+    char traineeNames[MAX_TRAINEES][NAME_LEN] = {
+        "Arthur", "Bella", "Cecil", "Dana",
+        "Eli", "Faye", "Gus", "Hana"
+    };
+
+    // Initialize data
+    initTrainees(trainees, MAX_TRAINEES, traineeNames);
+    printTrainees(trainees, MAX_TRAINEES);
+
+    // Input mentors
+    inputMentors(mentors, &mentorCount);
+
+    // Match and show results
+    matchMentoring(trainees, MAX_TRAINEES, mentors, mentorCount);
+    printMatches(trainees, mentors, mentorCount);
+
+    return 0;
+}
